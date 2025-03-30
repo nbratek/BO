@@ -1,0 +1,20 @@
+{
+  "groups": [
+    {"count": 3, "preferences": {"window": true}},
+    {"count": 7, "preferences": {}},
+    {"count": 6, "preferences": {"window": true}},
+    {"count": 4, "preferences": {}},
+    {"count": 2, "preferences": {"window": true}},
+    {"count": 7, "preferences": {}},
+    {"count": 6, "preferences": {}}
+  ],
+  "tables": [
+    {"capacity": 4, "features": {"window": true}},
+    {"capacity": 6, "features": {}},
+    {"capacity": 8, "features": {"near_kitchen": true}},
+    {"capacity": 8, "features": {}},
+    {"capacity": 2, "features": {"window": true}},
+    {"capacity": 6, "features": {"window": true}}
+  ]
+}
+
