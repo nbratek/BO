@@ -17,6 +17,7 @@ def main():
             genes.append(Gene(group, table_id, group_id))
         else:
             print(f"No table for a group of {group_id} with a number of {group.count} people")
+
     chromosome = Chromosome(genes, tables)
     print("Fitness:", chromosome.fitness())
     run_genetic_algorithm(groups, tables)
@@ -28,7 +29,8 @@ def run_genetic_algorithm(groups, tables):
 
     genetic_algorithm = GeneticAlgorithm(population_generator=population_generator, selection=GeneticAlgorithm.roulette_selection, stop=lambda _, __, i: i > 1000, mutation_probability=0.3)
     genetic_algorithm.first_generation = population_generator
-    solution = genetic_algorithm.simulate(1000)
+    solution = genetic_algorithm.simulate(20000)
+    # solution = genetic_algorithm.simulate(0)
     print("Solution:", solution)
 
 

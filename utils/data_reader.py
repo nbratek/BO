@@ -13,11 +13,11 @@ def input_data_reader(path):
     try:
         groups = []
         for group_data in data['groups']:
-            group = Group(group_data['count'], group_data['preferences'])
+            group = Group(group_data['count'],group_data['reservation'], group_data['preferences'])
             groups.append(group)
         tables = []
         for table_data in data['tables']:
-            table = Table(table_data['capacity'], table_data['features'])
+            table = Table(table_data['capacity'], table_data['position'], table_data['features'])
             tables.append(table)
     except KeyError as e:
         raise ValueError(f"Missing expected data key: {e}")

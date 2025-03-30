@@ -1,20 +1,23 @@
 {
   "groups": [
-    {"count": 3, "preferences": {"window": true}},
-    {"count": 7, "preferences": {}},
-    {"count": 6, "preferences": {"window": true}},
-    {"count": 4, "preferences": {}},
-    {"count": 2, "preferences": {"window": true}},
-    {"count": 7, "preferences": {}},
-    {"count": 6, "preferences": {}}
+    {"count": 7,"reservation": false,  "preferences": {}},
+    {"count": 6,"reservation": false,  "preferences": {"window": true}},
+    {"count": 4,"reservation": false,  "preferences": {}},
+    {"count": 2,"reservation": false,  "preferences": {"window": true}},
+    {"count": 7,"reservation": false,  "preferences": {}},
+    {"count": 1,"reservation": false,  "preferences":  {"garden": true}},
+    {"count": 6,"reservation": true,   "preferences": {}}
   ],
   "tables": [
-    {"capacity": 4, "features": {"window": true}},
-    {"capacity": 6, "features": {}},
-    {"capacity": 8, "features": {"near_kitchen": true}},
-    {"capacity": 8, "features": {}},
-    {"capacity": 2, "features": {"window": true}},
-    {"capacity": 6, "features": {"window": true}}
+    {"capacity": 8,"position": [3,8], "features": {"near_kitchen": true}},
+    {"capacity": 8,"position": [7,8], "features": {}},
+    {"capacity": 4,"position": [1,5], "features": {"window": true}},
+    {"capacity": 6,"position": [2,3], "features": {}},
+    {"capacity": 6,"position": [1,8], "features": {"window": true}},
+    {"capacity": 2,"position": [1,1], "features": {"window": true}},
+    {"capacity": 2,"position": [1,2], "features": {"window": true}},
+    {"capacity": 2,"position": [5,5], "features": {}},
+    {"capacity": 2,"position": [5,8], "features": {}}
   ]
 }
 
