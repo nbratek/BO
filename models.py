@@ -1,3 +1,5 @@
+from math import sqrt
+
 class Group:
     def __init__(self, count, reservation, preferences):
         self.count = count
@@ -5,11 +7,14 @@ class Group:
         self.preferences = preferences
 
 
+
 class Table:
-    def __init__(self, capacity, features=None):
+    def __init__(self, capacity,position, features=None):
         self.capacity = capacity
         self.features = features if features is not None else {}
-
+        self.x, self.y = position
+    def distance(self,other):
+        return sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
 
 class Gene:
     def __init__(self, group, table_id, group_id):
