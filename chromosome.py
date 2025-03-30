@@ -18,16 +18,15 @@ class Chromosome:
         return len(self.genes)
 
     def fitness(self):
-        window_tables = [0, 2, 4]
         score = 0
         table_usage = {table_id: 0 for table_id in range(len(self.tables))}
         for gene in self.genes:
             table_usage[gene.table_id] += gene.group.count
-            if gene.group.preferences.get("window") and gene.table_id in window_tables:
-                score += 10
+            for preference in gene.group.preferences.keys():
+                if preference in self.tables[gene.table_id].features.keys(): score += 10
         for table_id, used_capacity in table_usage.items():
             if used_capacity > self.tables[table_id].capacity:
-                score -= (used_capacity - self.tables[table_id].capacity) * 5
+                score -= (used_capacity - self.tables[table_id].capacity) * 15
         return score
 
     def cross(self, other):
