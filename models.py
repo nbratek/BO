@@ -1,6 +1,7 @@
 class Group:
-    def __init__(self, count, preferences):
+    def __init__(self, count, reservation, preferences):
         self.count = count
+        self.reservation = reservation
         self.preferences = preferences
 
 

@@ -1,12 +1,11 @@
 {
   "groups": [
-    {"count": 3, "preferences": {"window": true}},
-    {"count": 7, "preferences": {}},
-    {"count": 6, "preferences": {"window": true}},
-    {"count": 4, "preferences": {}},
-    {"count": 2, "preferences": {"window": true}},
-    {"count": 7, "preferences": {}},
-    {"count": 6, "preferences": {}}
+    {"count": 7,"reservation": false,  "preferences": {}},
+    {"count": 6,"reservation": false,  "preferences": {"window": true}},
+    {"count": 4,"reservation": false,  "preferences": {}},
+    {"count": 2,"reservation": false,  "preferences": {"window": true}},
+    {"count": 7,"reservation": false,  "preferences": {}},
+    {"count": 6,"reservation": true,  "preferences": {}}
   ],
   "tables": [
     {"capacity": 4, "features": {"window": true}},

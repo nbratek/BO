@@ -6,6 +6,7 @@ class Chromosome:
     def __init__(self, genes, tables):
         self.genes = genes
         self.tables = tables
+        self.all_tables_capacity = sum([table.capacity for table in tables])
 
     def __repr__(self):
         return f"<Chromosome with {len(self.genes)} genes at {id(self)}>"
@@ -18,15 +19,19 @@ class Chromosome:
         return len(self.genes)
 
     def fitness(self):
-        score = 0
+        score = 100
         table_usage = {table_id: 0 for table_id in range(len(self.tables))}
+
         for gene in self.genes:
             table_usage[gene.table_id] += gene.group.count
             for preference in gene.group.preferences.keys():
                 if preference in self.tables[gene.table_id].features.keys(): score += 10
+            score -= table_usage[gene.table_id] / self.all_tables_capacity
+            if gene.group.reservation:
+                score += 15
         for table_id, used_capacity in table_usage.items():
             if used_capacity > self.tables[table_id].capacity:
-                score -= (used_capacity - self.tables[table_id].capacity) * 15
+                score -= (used_capacity - self.tables[table_id].capacity) * 10
         return score
 
     def cross(self, other):

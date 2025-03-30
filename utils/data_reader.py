@@ -13,7 +13,7 @@ def input_data_reader(path):
     try:
         groups = []
         for group_data in data['groups']:
-            group = Group(group_data['count'], group_data['preferences'])
+            group = Group(group_data['count'],group_data['reservation'], group_data['preferences'])
             groups.append(group)
         tables = []
         for table_data in data['tables']:
