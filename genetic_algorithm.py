@@ -6,13 +6,14 @@ from chromosome import Chromosome
 class GeneticAlgorithm:
 
 
-    def __init__(self, population_generator, selection, stop, tables, mutation_probability=0.3, num_parents=3):
+    def __init__(self, population_generator, selection, stop, tables, groups, mutation_probability=0.3, num_parents=3):
         self.selection = selection
         self.stop = stop
         self.mutation_probability = mutation_probability
         self.population_generator = population_generator
         self.num_parents = num_parents
         self.tables = tables
+        self.groups = groups
 
     @staticmethod
     def roulette_selection(population, selected_no=2):
@@ -64,7 +65,7 @@ class GeneticAlgorithm:
                     child.append(random.choice(current[j % self.num_parents]))
                 current = self.clip(current, child[-1])
                 j += 1
-            children.append(Chromosome(child, self.tables))
+            children.append(Chromosome(child, self.tables, self.groups))
 
         # if random.random() <= self.mutation_probability:
         #     child1.mutate()

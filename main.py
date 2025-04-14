@@ -38,9 +38,9 @@ def run_genetic_algorithm(groups, tables):
             genetic_algorithm = GeneticAlgorithm(population_generator=population_generator,
                                                  selection=GeneticAlgorithm.roulette_selection,
                                                  stop=lambda _, __, i: i > 1000, mutation_probability=0.3,
-                                                 tables=tables, num_parents=i)
+                                                 tables=tables,groups=groups, num_parents=i)
             genetic_algorithm.first_generation = population_generator()
-            solution, generation = genetic_algorithm.simulate(20000)
+            solution, generation = genetic_algorithm.simulate(200)
             solutions.append((i, generation - 1000, solution))
             d_solutions.append(solutions)
             with open(f"results{i}.txt", "w") as f:
