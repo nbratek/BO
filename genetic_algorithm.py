@@ -27,7 +27,7 @@ class GeneticAlgorithm:
 
     def copy(self):
         new_genes = [copy.deepcopy(gene) for gene in self.genes]
-        return Chromosome(new_genes, self.tables)
+        return Chromosome(new_genes, self.tables, self.groups)
 
     def evolve(self, old_population):
         selected = self.selection(old_population)
@@ -58,10 +58,8 @@ class GeneticAlgorithm:
                 counter += 1
             else:
                 best_found = leading_member
+                print("Znaleziono nowe rozwiązanie w generacji : ",generation_idx)
                 counter = 0
             generation_idx += 1
+        #print(generation_idx)
         return best_found
-
-
-
-
