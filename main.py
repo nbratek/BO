@@ -27,11 +27,25 @@ def run_genetic_algorithm(groups, tables):
     def population_generator():
         return [Chromosome(seat_assignments(groups, tables), tables) for _ in range(100)]
 
-    genetic_algorithm = GeneticAlgorithm(population_generator=population_generator, selection=GeneticAlgorithm.roulette_selection, stop=lambda _, __, i: i > 1000, mutation_probability=0.3)
-    genetic_algorithm.first_generation = population_generator
-    solution = genetic_algorithm.simulate(20000)
+
     # solution = genetic_algorithm.simulate(0)
-    print("Solution:", solution)
+    d_solutions = []
+    for i in range(10):
+        solutions = []
+        for i in range(2, 11):
+            genetic_algorithm = GeneticAlgorithm(population_generator=population_generator,
+                                                 selection=GeneticAlgorithm.roulette_selection,
+                                                 stop=lambda _, __, i: i > 1000, mutation_probability=0.3,
+                                                 tables=tables, num_parents=i)
+            genetic_algorithm.first_generation = population_generator()
+            solution, generation = genetic_algorithm.simulate(20000)
+            solutions.append((i, generation - 1000, solution))
+            d_solutions.append(solutions)
+            with open(f"results{i}.txt", "w") as f:
+                for s in solutions:
+                    f.write(f"{s[0]}\t{s[1]}\t{s[2].fitness()}\n")
+
+
 
 
 if __name__ == '__main__':
