@@ -1,12 +1,12 @@
 {
   "groups": [
-    {"count": 7,"reservation": false,  "preferences": {}},
-    {"count": 6,"reservation": false,  "preferences": {"window": true}},
-    {"count": 4,"reservation": false,  "preferences": {}},
-    {"count": 2,"reservation": false,  "preferences": {"window": true}},
-    {"count": 7,"reservation": false,  "preferences": {}},
-    {"count": 1,"reservation": false,  "preferences":  {"garden": true}},
-    {"count": 6,"reservation": true,   "preferences": {}}
+    {"count": 7,"reservation": false, "preferences": {}},
+    {"count": 6,"reservation": false, "preferences": {"window": true}},
+    {"count": 4,"reservation": false, "preferences": {}},
+    {"count": 2,"reservation": false, "preferences": {"window": true}},
+    {"count": 7,"reservation": false, "preferences": {}},
+    {"count": 1,"reservation": false, "preferences": {"garden": true}},
+    {"count": 6,"reservation": true, "preferences": {}}
   ],
   "tables": [
     {"capacity": 8,"position": [3,8], "features": {"near_kitchen": true}},
@@ -20,4 +20,3 @@
     {"capacity": 2,"position": [5,8], "features": {}}
   ]
 }
-

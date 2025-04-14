@@ -1,4 +1,5 @@
 import random
+import sys
 from models import Gene
 from genetic_algorithm import GeneticAlgorithm
 from chromosome import seat_assignments
@@ -7,9 +8,11 @@ from chromosome import Chromosome
 
 
 def main():
-    input_path = 'resources/input.json'
+    filename = sys.argv[1] if len(sys.argv) > 1 else "input.json"
+    input_path = 'resources/' + filename
     groups, tables = input_data_reader(input_path)
     genes = []
+    # for group in groups: print(group.count, " ", group.reservation, " ", group.preferences, " \n")
     for group_id, group in enumerate(groups):
         possible_tables = [i for i, table in enumerate(tables) if group.count <= table.capacity]
         if possible_tables:
@@ -18,15 +21,14 @@ def main():
         else:
             print(f"No table for a group of {group_id} with a number of {group.count} people")
 
-    chromosome = Chromosome(genes, tables)
-    print("Fitness:", chromosome.fitness())
+    # chromosome = Chromosome(genes, tables)
+    # print("Fitness:", chromosome.fitness())
     run_genetic_algorithm(groups, tables)
 
 
 def run_genetic_algorithm(groups, tables):
     def population_generator():
-        return [Chromosome(seat_assignments(groups, tables), tables) for _ in range(100)]
-
+        return [Chromosome(seat_assignments(groups, tables), tables, groups) for _ in range(100)]
 
     # solution = genetic_algorithm.simulate(0)
     d_solutions = []
@@ -44,8 +46,6 @@ def run_genetic_algorithm(groups, tables):
             with open(f"results{i}.txt", "w") as f:
                 for s in solutions:
                     f.write(f"{s[0]}\t{s[1]}\t{s[2].fitness()}\n")
-
-
 
 
 if __name__ == '__main__':

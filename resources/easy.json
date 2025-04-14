@@ -1,0 +1,15 @@
+{
+    "groups": [
+      {"count": 4, "reservation": false, "preferences": {}},
+      {"count": 6, "reservation": true, "preferences": {}},
+      {"count": 2, "reservation": false, "preferences": {"window": true}},
+      {"count": 8, "reservation": false, "preferences": {}}
+    ],
+    "tables": [
+      {"capacity": 4, "position": [2,3], "features": {}},
+      {"capacity": 6, "position": [1,8], "features": {}},
+      {"capacity": 2, "position": [1,1], "features": {"window": true}},
+      {"capacity": 8, "position": [3,8], "features": {}}
+    ]
+  }
+
