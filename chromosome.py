@@ -60,7 +60,8 @@ class Chromosome:
             if group.reservation and group not in assigned_groups:
                 for other_group in self.groups:
                     if not other_group.reservation and other_group in assigned_groups:
-                        return float('-inf')
+                        score -= 200
+                        break
 
 
 

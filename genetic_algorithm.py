@@ -1,6 +1,7 @@
 import random
 import copy
 from chromosome import Chromosome
+from models import Gene
 
 
 class GeneticAlgorithm:
@@ -49,6 +50,7 @@ class GeneticAlgorithm:
             for g in parent:
                 if g.table_id == gene.table_id or g.group_id == gene.group_id:
                     parent.remove(g)
+
         return parents
 
     def reproduce(self, selected):
@@ -65,7 +67,11 @@ class GeneticAlgorithm:
                     child.append(random.choice(current[j % self.num_parents]))
                 current = self.clip(current, child[-1])
                 j += 1
-            children.append(Chromosome(child, self.tables, self.groups))
+            chromosome = Chromosome(child, self.tables, self.groups)
+            chromosome = self.fix_chromosome(chromosome)
+            children.append(chromosome)
+
+
 
         # if random.random() <= self.mutation_probability:
         #     child1.mutate()
@@ -75,8 +81,31 @@ class GeneticAlgorithm:
 
         return children
 
+    def fix_chromosome(self, chromosome):
+        assigned_groups = {gene.group_id for gene in chromosome.genes}
+        all_groups = {i for i in range(len(self.groups))}
+        missing_groups = all_groups - assigned_groups
+
+        for missing_group_id in missing_groups:
+            if len(chromosome.genes) >= len(self.tables): break
+            table = random.choice([i for i in range(len(self.tables))])
+            new_gene = Gene(self.groups[missing_group_id],table, missing_group_id)
+            chromosome.genes.append(new_gene)
+
+        seen_groups = set()
+        unique_genes = []
+        for gene in chromosome.genes:
+            if gene.group_id not in seen_groups:
+                unique_genes.append(gene)
+                seen_groups.add(gene.group_id)
+        chromosome.genes = unique_genes
+
+        return chromosome
+
 
     def simulate(self, total_generations):
+        best_generation = 0
+
         population = self.population_generator()
         if not population:
             raise ValueError("Initial population is empty and cannot be evolved.")
@@ -89,8 +118,9 @@ class GeneticAlgorithm:
                 counter += 1
             else:
                 best_found = leading_member
-                print("Znaleziono nowe rozwiązanie w generacji : ",generation_idx)
+                best_generation = generation_idx
+                # print("Znaleziono nowe rozwiązanie w generacji : ",generation_idx)
                 counter = 0
             generation_idx += 1
 
-        return best_found, generation_idx
+        return best_found, best_generation
