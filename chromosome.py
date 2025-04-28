@@ -1,23 +1,21 @@
 from models import Gene
 import random
 from itertools import combinations, zip_longest as zip_l
-
-
+import copy
 
 class Chromosome:
     def __init__(self, genes, tables, groups):
-        self.genes = genes
+        self.genes = genes  # Każdy gen odpowiada jednej grupie!
         self.tables = tables
         self.groups = groups
-        self.all_tables_capacity = sum([table.capacity for table in tables])
-
+        self.all_tables_capacity = sum(table.capacity for table in tables)
 
     def __repr__(self):
         return f"<Chromosome with {len(self.genes)} genes at {id(self)}>"
 
     def __str__(self):
         gene_details = '\n '.join(str(gene) for gene in self.genes)
-        return f"Assignment :\n {gene_details}\nfitness : {self.fitness()})"
+        return f"Assignment:\n {gene_details}\nfitness: {self.fitness()})"
 
     def __len__(self):
         return len(self.genes)
@@ -26,125 +24,98 @@ class Chromosome:
         score = 0
         table_usage = {table_id: 0 for table_id in range(len(self.tables))}
 
-        w1 = -1 / self.all_tables_capacity # waga dla liczba pustch miejsc przy stolikach
-        w2 = 10                            # waga dla spełniania preferencji klientów
-        w3 = -15                           # waga dla odległości między zajętymi stolikami
-        w4 = -50                           # waga dla liczby obsłóżoynch grup
+        w1 = -1 / self.all_tables_capacity  # waga za wolne miejsca
+        w2 = 10                              # waga za spełnianie preferencji
+        w3 = -15                             # waga za odległość zajętych stolików
+        w4 = -50                             # waga za brak przypisania grupy
 
+        assigned_groups = set()
 
         for gene in self.genes:
-            table_usage[gene.table_id] += gene.group.count
-            for preference in gene.group.preferences.keys(): # Jeśli to możliwe, spełniać preferencje klientów
-                if preference in self.tables[gene.table_id].features.keys(): score += w2
+            if gene.table_id is not None:
+                assigned_groups.add(gene.group)
+                table_usage[gene.table_id] += gene.group.count
+                for preference in gene.group.preferences.keys():
+                    if preference in self.tables[gene.table_id].features:
+                        score += w2
+                score += (self.tables[gene.table_id].capacity - gene.group.count) * w1
 
-            score += table_usage[gene.table_id] * w1 # Liczby pustych miejsc przy stolikach
-
-
-
-        # Odleglosc miedzy zajętymi stolikami
-        for t1, t2 in combinations(range(len(self.tables)),2):
+        # Odległości między zajętymi stolikami
+        for t1, t2 in combinations(range(len(self.tables)), 2):
             if table_usage[t1] and table_usage[t2]:
                 score += w3 / self.tables[t1].distance(self.tables[t2])
 
-        # Ile grup nie ma przydzielonego stolika
+        # Kary za brak przypisania grup
         for group in self.groups:
-            for gene in self.genes:
-                if gene.group == group: break
-            else:
+            if group not in assigned_groups:
                 score += w4
 
-        # Uwzględniać priorytet rezerwacji
-        assigned_groups = {gene.group for gene in self.genes}
-
+        # Uwzględnienie rezerwacji
         for group in self.groups:
             if group.reservation and group not in assigned_groups:
-                for other_group in self.groups:
-                    if not other_group.reservation and other_group in assigned_groups:
-                        return float('-inf')
+                for gene in self.genes:
+                    if gene.table_id is not None and not gene.group.reservation:
+                        score -= 200
+                        break
 
-
-
-        # Pojemność stolików nie może zostać przekroczona
+        # Pojemność stolików
         for table_id, used_capacity in table_usage.items():
             if used_capacity > self.tables[table_id].capacity:
                 return float('-inf')
 
         return score
 
-    # def cross(self, other):
-    #     common_genes = list(set(self.genes) & set(other.genes))
-    #
-    #     new_genes1 = common_genes + list(self.unique_genes(other, common_genes))
-    #     new_genes2 = common_genes +  list(other.unique_genes(self, common_genes))
-    #     return Chromosome(new_genes1, self.tables), Chromosome(new_genes2, other.tables)
-
     def cross(self, other):
         new_genes1 = []
         new_genes2 = []
 
-        for g1, g2 in zip_l(self.genes, other.genes):
+        for g1, g2 in zip(self.genes, other.genes):
             if random.random() > 0.5:
-                new_genes1.append((g1 if g1 is not None else g2))
-                new_genes2.append((g2 if g2 is not None else g1))
+                new_genes1.append(copy.deepcopy(g1))
+                new_genes2.append(copy.deepcopy(g2))
             else:
-                new_genes1.append((g2 if g2 is not None else g1))
-                new_genes2.append((g1 if g1 is not None else g2))
+                new_genes1.append(copy.deepcopy(g2))
+                new_genes2.append(copy.deepcopy(g1))
 
+        # Aby zapobiec klonom
         if new_genes1 == self.genes or new_genes2 == self.genes:
-            i = random.randint(0,len(new_genes1)-1)
+            i = random.randint(0, len(new_genes1) - 1)
             new_genes1[i], new_genes2[i] = new_genes2[i], new_genes1[i]
 
-        return Chromosome(new_genes1, self.tables, self.groups), Chromosome(new_genes2, other.tables, other.groups)
-
-    def unique_genes(self, other, current_genes):
-        used_tables = set()
-        used_groups = set()
-        unique_genes = set()
-        for gene in current_genes:
-            used_tables.add(gene.table_id)
-        for gene in current_genes:
-            used_groups.add(gene.group_id)
-        for gene in self.genes:
-            if gene.table_id not in used_tables and gene.group_id not in used_groups and gene not in other.genes:
-                unique_genes.add(gene)
-        return unique_genes
+        return Chromosome(new_genes1, self.tables, self.groups), Chromosome(new_genes2, self.tables, self.groups)
 
     def mutate(self):
-        if len(self.genes) < 2:
+        if len(self.genes) == 0:
             return
-        mutated_gene_idx = random.randint(0, len(self.genes) - 1)
-        mutated_gene = self.genes[mutated_gene_idx]
-        used_tables = set()
-        possible_tables = []
-        for gene in self.genes:
-            if gene != mutated_gene:
-                used_tables.add(gene.table_id)
-        for i, table in enumerate(self.tables):
-            if table.capacity >= mutated_gene.group.count and i not in used_tables:
-                possible_tables.append(i)
-        if not possible_tables:
-            return
-        new_table_id = random.choice(possible_tables)
-        new_gene = Gene(mutated_gene.group, new_table_id, mutated_gene.group_id)
-        self.genes[mutated_gene_idx] = new_gene
 
+        idx = random.randint(0, len(self.genes) - 1)
+        gene = self.genes[idx]
+
+        possible_tables = [
+            i for i, table in enumerate(self.tables)
+            if table.capacity >= gene.group.count
+        ]
+        possible_tables.append(None)
+
+        if possible_tables:
+            new_table_id = random.choice(possible_tables)
+            self.genes[idx] = Gene(gene.group, new_table_id, idx)
 
 def seat_assignments(groups, tables):
     genes = []
-    table_assigned = [False] * len(tables)
-    group_assigned = [False] * len(groups)
-    # if len(groups) > len(tables):
-    #     groups = groups[:len(tables)]
+    available_tables = set(range(len(tables)))
 
-    for group_id, group in enumerate(groups):
-        if not group_assigned[group_id]:
-            possible_tables = []
-            for i, table in enumerate(tables):
-                if group.count <= table.capacity and not table_assigned[i]:
-                    possible_tables.append(i)
-            if possible_tables:
-                chosen_table = random.choice(possible_tables)
-                genes.append(Gene(group, chosen_table, group_id))
-                table_assigned[chosen_table] = True
-                group_assigned[group_id] = True
+    for idx, group in enumerate(groups):
+        possible_tables = [
+            i for i in available_tables
+            if tables[i].capacity >= group.count
+        ]
+
+        if possible_tables:
+            chosen_table = random.choice(possible_tables)
+            genes.append(Gene(group, chosen_table, idx))
+            available_tables.remove(chosen_table)
+        else:
+            genes.append(Gene(group, None, idx))  # brak przypisania
+
     return genes
