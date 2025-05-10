@@ -5,7 +5,8 @@ from genetic_algorithm import GeneticAlgorithm
 from chromosome import seat_assignments
 from utils.data_reader import input_data_reader
 from chromosome import Chromosome
-
+import time
+import csv
 
 def main():
     filename = sys.argv[1] if len(sys.argv) > 1 else "input.json"
@@ -30,30 +31,34 @@ def run_genetic_algorithm(groups, tables):
     def population_generator():
         return [Chromosome(seat_assignments(groups, tables), tables, groups) for _ in range(50)]
 
-    # solution = genetic_algorithm.simulate(0)
     d_solutions = []
-    for i in range(1):
-        solutions = []
-        for i in range(2, 11):
-            print("==========",i, " parents==========")
-            genetic_algorithm = GeneticAlgorithm(population_generator=population_generator,
-                                                 selection=GeneticAlgorithm.ranking_selection,
-                                                 stop=lambda _, __, i: i > 1500, mutation_probability=0.3,
-                                                 tables=tables,groups=groups, num_parents=i)
-            genetic_algorithm.first_generation = population_generator()
-            solution, generation = genetic_algorithm.simulate(1500)
-            solutions.append((i, generation, solution))
-            d_solutions.append(solutions)
-            with open(f"results{i}.txt", "w") as f:
-                for s in solutions:
-                    f.write(f"{s[0]}\t{s[1]}\t{s[2].fitness()}\n")
 
-    # last_solutions = d_solutions[-1]
-    # last_solutions.sort(key=lambda x: x[2].fitness(), reverse=True)
-    best = max(d_solutions[-1], key=lambda x: x[2].fitness())
+    with open("results/results.csv", "w", newline="") as csvfile:
+        writer = csv.writer(csvfile, delimiter=';')
+        writer.writerow(["Run ID", "Liczba rodziców", "Generacja", "Fitness", "Czas [s]"])
 
-    print("Best nr of parents : ", best[0])
-    print(best[2])
+        for run_id in range(10):
+            for i in range(2, 11):
+                print("==========", i, " rodziców – uruchomienie", run_id, "==========")
+
+                genetic_algorithm = GeneticAlgorithm(
+                    population_generator=population_generator,
+                    selection=GeneticAlgorithm.roulette_selection,
+                    stop=lambda _, __, i: i > 1500,
+                    mutation_probability=0.3,
+                    tables=tables,
+                    groups=groups,
+                    num_parents=i
+                )
+                genetic_algorithm.first_generation = population_generator()
+                start_time = time.time()
+                solution, generation = genetic_algorithm.simulate(1500)
+                end_time = time.time()
+                total_time = end_time - start_time
+                writer.writerow([run_id, i, generation, f"{solution.fitness():.4f}", f"{total_time:.4f}"])
+                d_solutions.append((run_id, i, generation, solution, total_time))
+
+    # best = max(d_solutions[-9:], key=lambda x: x[3].fitness())
 
 
 if __name__ == '__main__':
